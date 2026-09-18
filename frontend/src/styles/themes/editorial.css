@@ -1,0 +1,49 @@
+/* Editorial — cream paper, serif headlines, terracotta accent. Cookbook feel, tighter radii. */
+
+[data-theme='editorial'] {
+  --kl-background: #fbf7f0;
+  --kl-foreground: #2a211b;
+  --kl-card: #fffdf9;
+  --kl-card-foreground: #2a211b;
+  --kl-surface-raised: #fffdf9;
+  --kl-muted: #f1e8da;
+  --kl-muted-foreground: #7a6a5b;
+  --kl-border: #e5d9c7;
+  --kl-input: #fffdf9;
+  --kl-ring: #b4542a;
+  --kl-primary: #b4542a;
+  --kl-primary-foreground: #fff8f2;
+  --kl-accent: #f3e0d3;
+  --kl-accent-foreground: #7c3a1c;
+  --kl-chip: #f1e8da;
+  --kl-chip-foreground: #6b5a4a;
+  --kl-destructive: #a32e21;
+  --kl-destructive-foreground: #fff8f2;
+
+  --kl-radius-card: 0.5rem;
+  --kl-radius-control: 0.375rem;
+  --kl-font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --kl-font-sans: 'Inter', system-ui, sans-serif;
+  --kl-display-tracking: -0.01em;
+}
+
+[data-theme='editorial'].dark {
+  --kl-background: #1b1512;
+  --kl-foreground: #f2e8dc;
+  --kl-card: #241c18;
+  --kl-card-foreground: #f2e8dc;
+  --kl-surface-raised: #2e2420;
+  --kl-muted: #2e2420;
+  --kl-muted-foreground: #a89383;
+  --kl-border: #3a2e28;
+  --kl-input: #241c18;
+  --kl-ring: #d9744a;
+  --kl-primary: #d9744a;
+  --kl-primary-foreground: #1b1512;
+  --kl-accent: #3d2a20;
+  --kl-accent-foreground: #eaa984;
+  --kl-chip: #2e2420;
+  --kl-chip-foreground: #c9b6a5;
+  --kl-destructive: #e0614c;
+  --kl-destructive-foreground: #1b1512;
+}

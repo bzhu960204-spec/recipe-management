@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: kitchen-ledger
+
+  datasource:
+    url: jdbc:h2:file:./data/kitchenledger;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  h2:
+    console:
+      enabled: false
+
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 12MB
+
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  # 8080 is commonly taken by other local tooling, so the app claims its own port.
+  port: ${KL_PORT:8088}
+
+kitchen-ledger:
+  jwt:
+    # Override in production via KL_JWT_SECRET. Must be >= 32 bytes.
+    secret: ${KL_JWT_SECRET:dev-only-secret-change-me-kitchen-ledger-0001}
+    expiration-minutes: 720
+    issuer: kitchen-ledger
+  storage:
+    upload-dir: ./data/uploads
+    max-image-bytes: 8388608
+  security:
+    max-failed-logins: 5
+    lockout-minutes: 15
+    allowed-origins:
+      - http://localhost:5173
+      - http://127.0.0.1:5173
+      # Private LAN ranges so a phone on the same network can reach the dev server.
+      - http://192.168.*:5173
+      - http://10.*:5173
+      - http://172.*:5173
+  admin:
+    username: ${KL_ADMIN_USERNAME:admin}
+    password: ${KL_ADMIN_PASSWORD:changeit}
+    display-name: Administrator
+
+logging:
+  level:
+    com.kitchenledger: INFO

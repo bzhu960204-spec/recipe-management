@@ -1,0 +1,49 @@
+/* Fresh — warm neutral paper with a single lime accent. Big radii, photo-forward. */
+
+[data-theme='fresh'] {
+  --kl-background: #f7f5f2;
+  --kl-foreground: #1c1a17;
+  --kl-card: #ffffff;
+  --kl-card-foreground: #1c1a17;
+  --kl-surface-raised: #ffffff;
+  --kl-muted: #efebe5;
+  --kl-muted-foreground: #6b6459;
+  --kl-border: #e3ddd4;
+  --kl-input: #ffffff;
+  --kl-ring: #b4e03a;
+  --kl-primary: #c6f24e;
+  --kl-primary-foreground: #1c2b05;
+  --kl-accent: #eaf7c9;
+  --kl-accent-foreground: #33410f;
+  --kl-chip: #efebe5;
+  --kl-chip-foreground: #4a443b;
+  --kl-destructive: #c0392b;
+  --kl-destructive-foreground: #ffffff;
+
+  --kl-radius-card: 1rem;
+  --kl-radius-control: 999px;
+  --kl-font-display: 'Inter', system-ui, sans-serif;
+  --kl-font-sans: 'Inter', system-ui, sans-serif;
+  --kl-display-tracking: -0.025em;
+}
+
+[data-theme='fresh'].dark {
+  --kl-background: #14130f;
+  --kl-foreground: #f2efe9;
+  --kl-card: #1e1c17;
+  --kl-card-foreground: #f2efe9;
+  --kl-surface-raised: #26231d;
+  --kl-muted: #26231d;
+  --kl-muted-foreground: #a79e90;
+  --kl-border: #302c24;
+  --kl-input: #1e1c17;
+  --kl-ring: #c6f24e;
+  --kl-primary: #c6f24e;
+  --kl-primary-foreground: #14200a;
+  --kl-accent: #2c3517;
+  --kl-accent-foreground: #d7f58a;
+  --kl-chip: #26231d;
+  --kl-chip-foreground: #c8c1b5;
+  --kl-destructive: #e05a4a;
+  --kl-destructive-foreground: #1a0f0d;
+}

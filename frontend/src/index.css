@@ -1,0 +1,78 @@
+@import 'tailwindcss';
+
+@import './styles/themes/fresh.css';
+@import './styles/themes/editorial.css';
+@import './styles/themes/minimal.css';
+
+/*
+ * Every colour, radius and font in the app resolves through these tokens.
+ * Components must never hardcode a hex value: that is what makes theme switching possible.
+ */
+@theme inline {
+  --color-background: var(--kl-background);
+  --color-foreground: var(--kl-foreground);
+  --color-card: var(--kl-card);
+  --color-card-foreground: var(--kl-card-foreground);
+  --color-surface-raised: var(--kl-surface-raised);
+  --color-muted: var(--kl-muted);
+  --color-muted-foreground: var(--kl-muted-foreground);
+  --color-border: var(--kl-border);
+  --color-input: var(--kl-input);
+  --color-ring: var(--kl-ring);
+  --color-primary: var(--kl-primary);
+  --color-primary-foreground: var(--kl-primary-foreground);
+  --color-accent: var(--kl-accent);
+  --color-accent-foreground: var(--kl-accent-foreground);
+  --color-chip: var(--kl-chip);
+  --color-chip-foreground: var(--kl-chip-foreground);
+  --color-destructive: var(--kl-destructive);
+  --color-destructive-foreground: var(--kl-destructive-foreground);
+
+  --radius-card: var(--kl-radius-card);
+  --radius-control: var(--kl-radius-control);
+
+  --font-display: var(--kl-font-display);
+  --font-sans: var(--kl-font-sans);
+}
+
+@layer base {
+  * {
+    border-color: var(--kl-border);
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--kl-background);
+    color: var(--kl-foreground);
+    font-family: var(--kl-font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--kl-font-display);
+    letter-spacing: var(--kl-display-tracking, -0.02em);
+  }
+
+  /* Keeps Cook Mode readable at arm's length without a second stylesheet. */
+  .cook-mode-text {
+    font-size: clamp(1.125rem, 1.6vw + 0.75rem, 1.5rem);
+    line-height: 1.65;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--kl-border) transparent;
+  }
+}

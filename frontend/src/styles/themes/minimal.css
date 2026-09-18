@@ -1,0 +1,49 @@
+/* Minimal — neutral greys, slate blue accent, tight radii and denser spacing. */
+
+[data-theme='minimal'] {
+  --kl-background: #ffffff;
+  --kl-foreground: #0f172a;
+  --kl-card: #ffffff;
+  --kl-card-foreground: #0f172a;
+  --kl-surface-raised: #f8fafc;
+  --kl-muted: #f1f5f9;
+  --kl-muted-foreground: #64748b;
+  --kl-border: #e2e8f0;
+  --kl-input: #ffffff;
+  --kl-ring: #3b60e4;
+  --kl-primary: #3b60e4;
+  --kl-primary-foreground: #ffffff;
+  --kl-accent: #e8edfd;
+  --kl-accent-foreground: #2544ad;
+  --kl-chip: #f1f5f9;
+  --kl-chip-foreground: #475569;
+  --kl-destructive: #dc2626;
+  --kl-destructive-foreground: #ffffff;
+
+  --kl-radius-card: 0.375rem;
+  --kl-radius-control: 0.375rem;
+  --kl-font-display: 'Inter', system-ui, sans-serif;
+  --kl-font-sans: 'Inter', system-ui, sans-serif;
+  --kl-display-tracking: -0.015em;
+}
+
+[data-theme='minimal'].dark {
+  --kl-background: #0b1120;
+  --kl-foreground: #e2e8f0;
+  --kl-card: #111827;
+  --kl-card-foreground: #e2e8f0;
+  --kl-surface-raised: #1e293b;
+  --kl-muted: #1e293b;
+  --kl-muted-foreground: #94a3b8;
+  --kl-border: #1f2937;
+  --kl-input: #111827;
+  --kl-ring: #6188f0;
+  --kl-primary: #6188f0;
+  --kl-primary-foreground: #0b1120;
+  --kl-accent: #1b2a4d;
+  --kl-accent-foreground: #a8c0f8;
+  --kl-chip: #1e293b;
+  --kl-chip-foreground: #cbd5e1;
+  --kl-destructive: #f05252;
+  --kl-destructive-foreground: #0b1120;
+}

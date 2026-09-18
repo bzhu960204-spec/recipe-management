@@ -1,0 +1,5 @@
+[
+  { "ref": "flour", "name": "面粉", "quantity": 0.5, "unit": "cup", "section": "腌料" },
+  { "ref": "egg", "name": "鸡蛋", "quantity": 1, "section": "腌料" },
+  { "name": "盐", "note": "适量", "section": "腌料", "optional": true }
+]

@@ -1,0 +1,4 @@
+[
+  { "title": "裹粉", "instruction": "鱼柳先裹面粉再裹蛋液。", "uses": ["flour", "egg"] },
+  { "title": "油炸", "instruction": "180°C 炸至金黄。", "durationSeconds": 120, "temperatureC": 180 }
+]

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "recipe-extraction/v1",
+  "title": "炸鱼柳",
+  "description": "冷冻鱼柳用香料腌过，裹上白醋和小苏打调的脆浆，高温快炸，外壳酥脆、鱼肉软嫩。",
+  "source": {
+    "name": "小高姐",
+    "type": "VIDEO"
+  },
+  "servings": {
+    "amount": 4,
+    "unit": "人份"
+  },
+  "times": {
+    "prepMinutes": 25,
+    "cookMinutes": 6
+  },
+  "difficulty": "EASY",
+  "tags": ["鱼", "油炸", "小高姐"],
+  "ingredients": [
+    {
+      "ref": "fish",
+      "section": "鱼柳",
+      "name": "冷冻鱼柳",
+      "quantity": 500,
+      "unit": "g",
+      "note": "袋装，解冻后斜刀切条"
+    },
+    {
+      "ref": "thaw-salt",
+      "section": "鱼柳",
+      "name": "盐",
+      "note": "解冻时加一点，帮助更快化开"
+    },
+    {
+      "ref": "cumin",
+      "section": "腌料",
+      "name": "孜然粉"
+    },
+    {
+      "ref": "coriander",
+      "section": "腌料",
+      "name": "香菜籽粉"
+    },
+    {
+      "ref": "chili",
+      "section": "腌料",
+      "name": "辣椒碎"
+    },
+    {
+      "ref": "garlic-powder",
+      "section": "腌料",
+      "name": "蒜粉",
+      "note": "一点点"
+    },
+    {
+      "ref": "salt",
+      "section": "腌料",
+      "name": "盐"
+    },
+    {
+      "ref": "crisp-flour",
+      "section": "脆浆",
+      "name": "脆炸粉",
+      "note": "无麸质版本，也可用面粉加淀粉；含小苏打和泡打粉"
+    },
+    {
+      "ref": "vinegar",
+      "section": "脆浆",
+      "name": "白醋",
+      "quantity": 2,
+      "unit": "大勺",
+      "note": "高温炸制后完全挥发，吃不出酸味"
+    },
+    {
+      "ref": "frying-oil",
+      "section": "脆浆",
+      "name": "食用油",
+      "note": "炸制用量",
+      "scalable": false
+    }
+  ],
+  "steps": [
+    {
+      "section": "准备",
+      "title": "解冻",
+      "text": "冷冻鱼柳放水里解冻，加一点点盐帮助它更快化开。",
+      "uses": ["fish", "thaw-salt"]
+    },
+    {
+      "section": "准备",
+      "title": "切条",
+      "text": "把水倒掉，鱼肉上带一点水分不要紧。沿着鱼肉中间的缝一分为二，再斜刀切出鱼柳。",
+      "uses": ["fish"]
+    },
+    {
+      "section": "准备",
+      "title": "腌制",
+      "text": "加孜然粉、香菜籽粉、辣椒碎、一点点蒜粉和盐，搅拌均匀，腌一小会儿，或者放冰箱里过夜。",
+      "durationSeconds": 900,
+      "uses": ["fish", "cumin", "coriander", "chili", "garlic-powder", "salt"]
+    },
+    {
+      "section": "脆浆",
+      "title": "调浆",
+      "text": "取两大勺白醋和两大勺干粉，用筷子随便搅拌一下。醋一碰到小苏打和泡打粉就开始反应，会产生很多小泡泡，先搅成面浆的状态。",
+      "uses": ["vinegar", "crisp-flour"]
+    },
+    {
+      "section": "脆浆",
+      "title": "裹粉",
+      "text": "用面浆粘更多的干粉，这时候可以多放一点。用筷子把鱼肉从底下铲起来翻拌，已经粘上的粉就不容易掉。碗底如果还剩干粉就再加一点醋，醋多了就再加点粉，拌到碗底没有剩余干粉。鱼柳表面粘满小颗粒、看不到干粉也看不到液体就可以了。",
+      "uses": ["fish", "crisp-flour", "vinegar"]
+    },
+    {
+      "section": "炸制",
+      "title": "下锅",
+      "text": "油烧到大概190摄氏度，分两锅下入鱼柳，一次不要放太多。",
+      "temperature": {
+        "value": 190,
+        "unit": "C"
+      },
+      "uses": ["frying-oil", "fish"]
+    },
+    {
+      "section": "炸制",
+      "title": "炸熟",
+      "text": "全程大火，鱼柳容易熟，表面炸到焦黄就出锅，大概2到3分钟。",
+      "durationSeconds": 150,
+      "uses": ["fish"]
+    }
+  ],
+  "notes": "小苏打加白醋的脆浆炸出来外壳特别酥脆，高温下白醋完全挥发，尝不到酸味。脆炸粉可以一次多调一些，盖上盖子下次接着用。"
+}

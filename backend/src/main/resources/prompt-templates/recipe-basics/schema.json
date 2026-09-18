@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": { "type": "string", "maxLength": 255 },
+    "description": { "type": "string" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "maxLength": 255 },
+        "url": { "type": "string", "pattern": "^https?://" },
+        "type": { "enum": ["VIDEO", "WEB", "BOOK", "ORIGINAL"] }
+      }
+    },
+    "imageUrl": { "type": "string", "pattern": "^https?://" },
+    "servings": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "amount": { "type": "number", "exclusiveMinimum": 0 },
+        "unit": { "type": "string", "maxLength": 64 }
+      }
+    },
+    "times": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prepMinutes": { "type": "integer", "minimum": 0 },
+        "cookMinutes": { "type": "integer", "minimum": 0 },
+        "totalMinutes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "difficulty": { "enum": ["EASY", "MEDIUM", "HARD"] },
+    "tags": { "type": "array", "items": { "type": "string", "maxLength": 80 } },
+    "favorite": { "type": "boolean" }
+  }
+}

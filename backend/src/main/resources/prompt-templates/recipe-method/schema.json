@@ -1,0 +1,32 @@
+{
+  "oneOf": [
+    { "type": "array", "items": { "$ref": "#/$defs/step" } },
+    {
+      "type": "object",
+      "required": ["steps"],
+      "additionalProperties": false,
+      "properties": {
+        "steps": { "type": "array", "items": { "$ref": "#/$defs/step" } }
+      }
+    }
+  ],
+  "$defs": {
+    "step": {
+      "type": "object",
+      "required": ["instruction"],
+      "additionalProperties": false,
+      "properties": {
+        "instruction": { "type": "string" },
+        "title": { "type": "string", "maxLength": 255 },
+        "section": { "type": "string", "maxLength": 120 },
+        "durationSeconds": { "type": "integer", "minimum": 0 },
+        "temperatureC": { "type": "number", "description": "Temperature in Celsius." },
+        "uses": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "ingredient.ref (or name) values consumed by this step."
+        }
+      }
+    }
+  }
+}

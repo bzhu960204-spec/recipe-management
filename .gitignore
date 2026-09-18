@@ -1,0 +1,42 @@
+# ---- Build output ----
+target/
+dist/
+build/
+*.tsbuildinfo
+
+# ---- Dependencies ----
+node_modules/
+
+# ---- Runtime data (H2 database + uploaded images) ----
+# Written at runtime under both data/ and backend/data/; never commit user data.
+data/
+backend/data/
+*.mv.db
+*.trace.db
+*.lock.db
+*.db.bak*
+
+# ---- Local env / secrets ----
+.env
+.env.*
+!.env.example
+*.local
+
+# ---- Resolved-port state written by start-dev / start-prod ----
+.kl-dev-state.json
+.kl-prod-state.json
+
+# ---- Logs ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# ---- Editor / IDE / OS ----
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini

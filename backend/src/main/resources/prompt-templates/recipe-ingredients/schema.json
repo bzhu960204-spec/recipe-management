@@ -1,0 +1,39 @@
+{
+  "oneOf": [
+    { "type": "array", "items": { "$ref": "#/$defs/ingredient" } },
+    {
+      "type": "object",
+      "required": ["ingredients"],
+      "additionalProperties": false,
+      "properties": {
+        "ingredients": { "type": "array", "items": { "$ref": "#/$defs/ingredient" } }
+      }
+    }
+  ],
+  "$defs": {
+    "ingredient": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Stable key used to match on Import and referenced by step.uses. Never a positional index."
+        },
+        "name": { "type": "string", "maxLength": 255 },
+        "quantity": {
+          "type": "number",
+          "description": "Numbers only. 'to taste' belongs in note, with quantity omitted."
+        },
+        "quantityMax": { "type": "number", "description": "Upper bound of a range." },
+        "unit": { "type": "string", "maxLength": 48 },
+        "note": { "type": "string", "maxLength": 255 },
+        "section": { "type": "string", "maxLength": 120 },
+        "optional": { "type": "boolean" },
+        "scalable": { "type": "boolean", "default": true },
+        "rawText": { "type": "string", "maxLength": 512, "description": "Original line, kept verbatim." }
+      }
+    }
+  }
+}

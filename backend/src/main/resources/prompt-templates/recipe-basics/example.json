@@ -1,0 +1,9 @@
+{
+  "title": "炸鱼柳",
+  "description": "外酥里嫩的家常炸鱼柳。",
+  "source": { "name": "Kenji López-Alt", "url": "https://example.com", "type": "WEB" },
+  "servings": { "amount": 2, "unit": "servings" },
+  "times": { "prepMinutes": 15, "cookMinutes": 10 },
+  "difficulty": "EASY",
+  "tags": ["fried", "fish"]
+}
