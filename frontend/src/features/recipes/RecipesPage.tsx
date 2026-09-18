@@ -46,7 +46,7 @@ export function RecipesPage() {
   const totalCount = recipes.data?.totalElements ?? 0;
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-1 md:grid-cols-[minmax(300px,340px)_1fr] lg:grid-cols-[264px_minmax(300px,340px)_1fr]">
+    <div className="grid h-full min-h-0 grid-cols-1 md:grid-cols-[340px_1fr] lg:grid-cols-[264px_340px_1fr]">
       <aside className="hidden min-h-0 overflow-y-auto scrollbar-thin border-r border-border lg:block">
         <TagWall
           tags={tags.data ?? []}
@@ -59,7 +59,7 @@ export function RecipesPage() {
 
       <section
         className={cn(
-          'flex min-h-0 flex-col border-r border-border',
+          'flex min-h-0 min-w-0 flex-col border-r border-border',
           selectedId ? 'hidden md:flex' : 'flex',
         )}
       >
