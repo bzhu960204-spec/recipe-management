@@ -32,7 +32,7 @@
       }
     },
     "difficulty": { "enum": ["EASY", "MEDIUM", "HARD"] },
-    "tags": { "type": "array", "items": { "type": "string", "maxLength": 80 } },
+    "category": { "type": "string", "maxLength": 80 },
     "favorite": { "type": "boolean" }
   }
 }

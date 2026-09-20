@@ -31,7 +31,7 @@ public class ImportService {
     private static final Set<String> KNOWN_RECIPE_KEYS = Set.of(
             "title", "name", "description", "summary", "source", "sourceUrl", "sourceName", "sourceType",
             "url", "imageUrl", "image", "servings", "serves", "yield", "times", "prepMinutes", "cookMinutes",
-            "totalMinutes", "prepTime", "cookTime", "totalTime", "difficulty", "tags", "categories",
+            "totalMinutes", "prepTime", "cookTime", "totalTime", "difficulty", "category",
             "ingredients", "steps", "instructions", "notes", "personalNotes", "favorite", "schemaVersion");
 
     private static final int MAX_RECIPES_PER_IMPORT = 200;
@@ -96,7 +96,7 @@ public class ImportService {
         if (!node.isObject()) {
             warnings.add("Entry is not a JSON object and was skipped");
             return new RecipeUpsertRequest("Untitled recipe", null, null, null, null, null, null, null, null,
-                    null, List.of(), List.of(), List.of(), node.toString());
+                    null, null, List.of(), List.of(), node.toString());
         }
 
         reportUnknownKeys(node, warnings);
@@ -118,7 +118,7 @@ public class ImportService {
                 readDifficulty(node, warnings),
                 node.path("favorite").asBoolean(false),
                 text(node, "notes", "personalNotes"),
-                readTags(node),
+                readCategory(node),
                 readIngredients(node, warnings),
                 readSteps(node, warnings),
                 node.toString());
@@ -283,29 +283,13 @@ public class ImportService {
         }
     }
 
-    private List<String> readTags(JsonNode node) {
-        JsonNode tags = node.has("tags") ? node.get("tags") : node.get("categories");
-        if (tags == null || tags.isNull()) {
-            return List.of();
+    private String readCategory(JsonNode node) {
+        JsonNode category = node.get("category");
+        if (category == null || category.isNull() || !category.isTextual()) {
+            return null;
         }
-        if (tags.isTextual()) {
-            return java.util.Arrays.stream(tags.asText().split(","))
-                    .map(String::trim)
-                    .filter(value -> !value.isEmpty())
-                    .toList();
-        }
-        if (tags.isArray()) {
-            List<String> values = new ArrayList<>();
-            for (JsonNode tag : tags) {
-                if (tag.isTextual() && !tag.asText().isBlank()) {
-                    values.add(tag.asText().trim());
-                } else if (tag.isObject() && tag.has("name")) {
-                    values.add(tag.get("name").asText().trim());
-                }
-            }
-            return values;
-        }
-        return List.of();
+        String value = category.asText().trim();
+        return value.isEmpty() ? null : value;
     }
 
     private List<RecipeUpsertRequest.IngredientInput> readIngredients(JsonNode node, List<String> warnings) {

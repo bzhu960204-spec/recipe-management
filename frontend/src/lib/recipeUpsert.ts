@@ -30,7 +30,7 @@ export function detailToUpsert(detail: RecipeDetail): RecipeUpsert {
     difficulty: detail.difficulty,
     favorite: detail.favorite,
     notes: detail.personalNotes ?? null,
-    tags: detail.tags.map((tag) => tag.name),
+    category: detail.category?.name ?? null,
     ingredients: detail.ingredients.map((ingredient) => ({
       ref: ingredient.refKey ?? null,
       section: ingredient.section ?? null,
@@ -61,7 +61,7 @@ export function emptyRecipeUpsert(): RecipeUpsert {
   return {
     title: '',
     servings: { amount: 2, unit: null },
-    tags: [],
+    category: null,
     ingredients: [],
     steps: [],
   };

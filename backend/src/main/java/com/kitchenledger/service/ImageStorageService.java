@@ -59,8 +59,7 @@ public class ImageStorageService {
         String extension = detectExtension(header)
                 .orElseThrow(() -> new BadRequestException("Unsupported image format; use JPEG, PNG, WebP or AVIF"));
 
-        String id = UUID.randomUUID().toString().replace("-", "");
-        String key = id.substring(0, 2) + "/" + id + "." + extension;
+        String key = newKey(extension);
         Path target = resolve(key);
 
         try {
@@ -72,6 +71,36 @@ public class ImageStorageService {
             throw new IllegalStateException("Could not store image", ex);
         }
         return key;
+    }
+
+    /** Stores raw image bytes (e.g. a thumbnail fetched from a remote source) with the same guarantees. */
+    public String store(byte[] data) {
+        if (data == null || data.length == 0) {
+            throw new BadRequestException("No image supplied");
+        }
+        if (data.length > maxBytes) {
+            throw new BadRequestException("Image exceeds the maximum allowed size");
+        }
+
+        byte[] header = Arrays.copyOf(data, Math.min(16, data.length));
+        String extension = detectExtension(header)
+                .orElseThrow(() -> new BadRequestException("Unsupported image format; use JPEG, PNG, WebP or AVIF"));
+
+        String key = newKey(extension);
+        Path target = resolve(key);
+
+        try {
+            Files.createDirectories(target.getParent());
+            Files.write(target, data);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Could not store image", ex);
+        }
+        return key;
+    }
+
+    private String newKey(String extension) {
+        String id = UUID.randomUUID().toString().replace("-", "");
+        return id.substring(0, 2) + "/" + id + "." + extension;
     }
 
     public Path load(String key) {

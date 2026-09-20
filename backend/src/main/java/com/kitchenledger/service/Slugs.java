@@ -6,7 +6,8 @@ import java.util.regex.Pattern;
 
 public final class Slugs {
 
-    private static final Pattern NON_ALNUM = Pattern.compile("[^a-z0-9]+");
+    // Keep Unicode letters/digits (incl. CJK) so distinct non-ASCII names don't collapse to one slug.
+    private static final Pattern NON_ALNUM = Pattern.compile("[^\\p{IsAlphabetic}\\p{IsDigit}]+");
     private static final Pattern EDGE_DASHES = Pattern.compile("(^-|-$)");
 
     private Slugs() {

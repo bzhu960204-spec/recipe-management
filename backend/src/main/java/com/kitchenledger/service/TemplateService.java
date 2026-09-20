@@ -195,8 +195,8 @@ public class TemplateService {
     }
 
     /**
-     * {@code Slugs.of} collapses every non-ASCII name to the same value, so a numeric suffix is
-     * what keeps two Chinese-named templates from colliding on the unique index.
+     * Appends a numeric suffix so two templates that share a name (and therefore a base slug) don't
+     * collide on the unique index.
      */
     private String uniqueSlug(Long ownerId, String name, Long selfId) {
         String base = Slugs.of(name);

@@ -15,7 +15,7 @@
     "cookMinutes": 6
   },
   "difficulty": "EASY",
-  "tags": ["鱼", "油炸", "小高姐"],
+  "category": "鱼",
   "ingredients": [
     {
       "ref": "fish",

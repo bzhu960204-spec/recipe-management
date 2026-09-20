@@ -7,17 +7,17 @@ describe('parseBasics', () => {
     expect(value).toEqual({ title: 'Shoyu Chicken', difficulty: 'EASY' });
   });
 
-  it('normalises nested source, servings, times and tags', () => {
+  it('normalises nested source, servings, times and category', () => {
     const value = parseBasics({
       source: { name: 'Kenji', url: 'https://x', type: 'WEB' },
       servings: { amount: '2', unit: 'servings' },
       times: { prepMinutes: 10 },
-      tags: [' fried ', '', 'fish'],
+      category: 'fried',
     });
     expect(value.source).toEqual({ name: 'Kenji', url: 'https://x', type: 'WEB' });
     expect(value.servings).toEqual({ amount: 2, unit: 'servings' });
     expect(value.times).toEqual({ prepMinutes: 10, cookMinutes: null, totalMinutes: null });
-    expect(value.tags).toEqual(['fried', 'fish']);
+    expect(value.category).toEqual('fried');
   });
 
   it('rejects an unknown difficulty', () => {

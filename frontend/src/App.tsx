@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from '@/components/AppShell';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { RequireAuth } from '@/features/auth/RequireAuth';
+import { WidthMatrixPage } from '@/features/dev/WidthMatrixPage';
 import { ImportPage } from '@/features/import/ImportPage';
 import { RecipeEditorPage } from '@/features/recipes/RecipeEditorPage';
 import { RecipesPage } from '@/features/recipes/RecipesPage';
@@ -21,6 +22,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        {import.meta.env.DEV && (
+          <Route path="/dev/widths" element={<RequireAuth><WidthMatrixPage /></RequireAuth>} />
+        )}
         <Route
           element={
             <RequireAuth>

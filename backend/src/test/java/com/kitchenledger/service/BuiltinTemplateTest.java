@@ -44,7 +44,7 @@ class BuiltinTemplateTest {
         assertThat(recipe.title()).isEqualTo("炸鱼柳");
         assertThat(recipe.ingredients()).isNotEmpty();
         assertThat(recipe.steps()).isNotEmpty();
-        assertThat(recipe.tags()).isNotEmpty();
+        assertThat(recipe.category()).isNotBlank();
     }
 
     @Test

@@ -444,10 +444,9 @@ export async function buildRecipeHtml(recipe: RecipeDetail): Promise<string> {
 
   const cover = await resolveImage(recipe.imageKey, recipe.imageUrl);
   const coverImg = cover ? `<img class="cover" src="${esc(cover)}" alt="" />` : '';
-  const tags =
-    recipe.tags.length > 0
-      ? `<div class="tags">${recipe.tags.map((tag) => `<span class="tag-pill">${esc(tag.name)}</span>`).join('')}</div>`
-      : '';
+  const tags = recipe.category
+    ? `<div class="tags"><span class="tag-pill">${esc(recipe.category.name)}</span></div>`
+    : '';
   const description = recipe.description ? `<p class="desc">${esc(recipe.description)}</p>` : '';
   const ingredients = recipe.ingredients.length > 0 ? ingredientsColumn(recipe.ingredients, hasBase) : '';
   const method = recipe.steps.length > 0 ? await methodColumn(recipe.steps, byId) : '';

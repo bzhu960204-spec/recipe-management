@@ -10,7 +10,7 @@ export type ImportMode = 'import' | 'update';
 
 export type BasicsPayload = Pick<
   RecipeUpsert,
-  'title' | 'description' | 'source' | 'imageUrl' | 'servings' | 'times' | 'difficulty' | 'favorite' | 'tags'
+  'title' | 'description' | 'source' | 'imageUrl' | 'servings' | 'times' | 'difficulty' | 'favorite' | 'category'
 >;
 export type IngredientPayload = NonNullable<RecipeUpsert['ingredients']>[number];
 export type StepPayload = NonNullable<RecipeUpsert['steps']>[number];
@@ -115,16 +115,7 @@ export function parseBasics(parsed: unknown): BasicsPayload {
     }
   }
 
-  if ('tags' in parsed) {
-    const tags = parsed.tags;
-    if (tags == null) {
-      result.tags = [];
-    } else if (Array.isArray(tags)) {
-      result.tags = tags.map((tag, index) => asString(tag, `tags[${index}]`).trim()).filter(Boolean);
-    } else {
-      throw new Error('"tags" must be an array of text.');
-    }
-  }
+  if ('category' in parsed) result.category = optString(parsed.category, 'category');
 
   return result;
 }

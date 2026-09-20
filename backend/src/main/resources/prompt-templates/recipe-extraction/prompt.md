@@ -24,7 +24,7 @@ One recipe is one JSON object. For several recipes, return `{"recipes": [ ... ]}
   "servings":     { "amount": number, "unit": string }
   "times":        { "prepMinutes": number, "cookMinutes": number, "totalMinutes": number }
   "difficulty":   "EASY" | "MEDIUM" | "HARD"
-  "tags":         [string] cuisine, main ingredient, method, occasion
+  "category":     string   one classification for the dish, e.g. main ingredient or cuisine
   "ingredients":  [ingredient]  (required)
   "steps":        [step]        (required)
   "notes":        string   tips that are not a step: substitutions, storage, warnings

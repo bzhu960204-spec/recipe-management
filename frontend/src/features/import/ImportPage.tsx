@@ -177,9 +177,9 @@ export function ImportPage() {
                         </Button>
                       </div>
 
-                      {(item.recipe.tags?.length ?? 0) > 0 && (
+                      {item.recipe.category && (
                         <div className="mt-2 flex flex-wrap gap-1.5">
-                          {item.recipe.tags?.map((tag) => <Chip key={tag}>{tag}</Chip>)}
+                          <Chip>{item.recipe.category}</Chip>
                         </div>
                       )}
 

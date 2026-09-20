@@ -98,7 +98,7 @@ $payload = @{
     servings    = '12'
     times       = @{ prepMinutes = 20; cookMinutes = 80 }
     difficulty  = 'easy'
-    tags        = @('Poultry', 'poultry', 'Weeknight')
+    category    = 'Poultry'
     calories    = 420
     ingredients = @(
         '1 cup soy sauce',
@@ -183,9 +183,9 @@ Test-Step 'steps resolve their ingredient refs' {
     }
 }
 
-Test-Step 'duplicate tag names collapse by slug' {
+Test-Step 'the imported recipe keeps its single category' {
     $detail = Invoke-Api -Method GET -Path "/api/recipes/$recipeId" -Token $adminToken
-    if ($detail.tags.Count -ne 2) { throw "expected 2 tags, got $($detail.tags.Count)" }
+    if ($detail.category.name -ne 'Poultry') { throw "expected category Poultry, got $($detail.category.name)" }
 }
 
 Test-Step 'the original payload is archived for future schema changes' {
@@ -198,9 +198,9 @@ Test-Step 'search matches on ingredient name' {
     if ($results.totalElements -lt 1) { throw 'ingredient search found nothing' }
 }
 
-Test-Step 'tag browse returns the recipe' {
-    $results = Invoke-Api -Method GET -Path '/api/recipes?tag=poultry' -Token $adminToken
-    if ($results.totalElements -lt 1) { throw 'tag filter found nothing' }
+Test-Step 'category browse returns the recipe' {
+    $results = Invoke-Api -Method GET -Path '/api/recipes?category=poultry' -Token $adminToken
+    if ($results.totalElements -lt 1) { throw 'category filter found nothing' }
 }
 
 # --- isolation --------------------------------------------------------------

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { AlertTriangle, ArrowDown, ArrowUp, Check, ChevronDown, ChevronRight, ClipboardPaste, FileJson, GripVertical, ListPlus, Loader2, Plus, Trash2, X } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowUp, Check, ChevronDown, ChevronRight, ClipboardPaste, FileJson, GripVertical, ListPlus, Loader2, Plus, Trash2 } from 'lucide-react';
 import {
   DndContext,
   KeyboardSensor,
@@ -32,8 +32,9 @@ import {
   type StepPayload,
 } from '@/lib/sectionImport';
 import { cn } from '@/lib/utils';
+import { isYouTubeUrl } from '@/lib/youtube';
 import type { Difficulty, RecipeUpsert, SourceType } from '@/lib/types';
-import { useTags } from './queries';
+import { useCategories } from './queries';
 
 interface IngredientDraft {
   uid: string;
@@ -76,7 +77,7 @@ interface Draft {
   difficulty: Difficulty | '';
   favorite: boolean;
   notes: string;
-  tags: string[];
+  category: string;
   ingredients: IngredientDraft[];
   steps: StepDraft[];
   importPayload: string | null;
@@ -177,7 +178,7 @@ function toDraft(value: RecipeUpsert): Draft {
     difficulty: value.difficulty ?? '',
     favorite: value.favorite ?? false,
     notes: text(value.notes),
-    tags: value.tags ?? [],
+    category: text(value.category),
     ingredients,
     steps: (value.steps ?? []).map((step) => ({
       uid: nextUid(),
@@ -220,7 +221,7 @@ function toUpsert(draft: Draft): RecipeUpsert {
     difficulty: draft.difficulty === '' ? null : draft.difficulty,
     favorite: draft.favorite,
     notes: blankToNull(draft.notes),
-    tags: draft.tags,
+    category: blankToNull(draft.category),
     ingredients: ingredients.map((ingredient) => ({
       ref: ingredient.ref,
       rawText: ingredient.rawText,
@@ -274,7 +275,7 @@ function basicsPatch(payload: BasicsPayload, mode: ImportMode): Partial<Draft> {
     patch.cookMinutes = numberText(payload.times?.cookMinutes);
     patch.totalMinutes = numberText(payload.times?.totalMinutes);
   }
-  if (mode === 'update' || has('tags')) patch.tags = payload.tags ?? [];
+  if (mode === 'update' || has('category')) patch.category = payload.category ?? '';
   return patch;
 }
 
@@ -411,7 +412,7 @@ const JSON_IMPORT_CONFIG: Record<
   basics: {
     title: 'Import basics from JSON',
     description: 'See the "Recipe basics" template for the exact JSON shape.',
-    placeholder: '{\n  "title": "Shoyu Chicken",\n  "servings": { "amount": 2, "unit": "servings" },\n  "difficulty": "EASY",\n  "tags": ["chicken"]\n}',
+    placeholder: '{\n  "title": "Shoyu Chicken",\n  "servings": { "amount": 2, "unit": "servings" },\n  "difficulty": "EASY",\n  "category": "chicken"\n}',
   },
   ingredients: {
     title: 'Import ingredients from JSON',
@@ -428,7 +429,6 @@ const JSON_IMPORT_CONFIG: Record<
 
 export function RecipeForm({ initial, submitLabel, pending = false, error, onSubmit, onCancel, onAutoSave }: Props) {
   const [draft, setDraft] = useState<Draft>(() => toDraft(initial));
-  const [tagInput, setTagInput] = useState('');
   const [validation, setValidation] = useState<string | null>(null);
   const [tab, setTab] = useState<EditorTab>('basics');
   const [autoStatus, setAutoStatus] = useState<AutoStatus>('idle');
@@ -437,11 +437,11 @@ export function RecipeForm({ initial, submitLabel, pending = false, error, onSub
   const [importText, setImportText] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
   const [jsonImport, setJsonImport] = useState<'basics' | 'ingredients' | 'steps' | null>(null);
-  const tags = useTags();
+  const categories = useCategories();
 
   const suggestions = useMemo(
-    () => (tags.data ?? []).map((tag) => tag.name).filter((name) => !draft.tags.includes(name)),
-    [tags.data, draft.tags],
+    () => (categories.data ?? []).map((category) => category.name),
+    [categories.data],
   );
 
   const ingredientGroups = useMemo(() => groupIngredients(draft.ingredients), [draft.ingredients]);
@@ -699,16 +699,6 @@ export function RecipeForm({ initial, submitLabel, pending = false, error, onSub
     scheduleAutoSave();
   }
 
-  function addTag(raw: string) {
-    const name = raw.trim();
-    if (!name || draft.tags.includes(name)) {
-      setTagInput('');
-      return;
-    }
-    patch({ tags: [...draft.tags, name] });
-    setTagInput('');
-  }
-
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (!draft.title.trim()) {
@@ -845,44 +835,18 @@ export function RecipeForm({ initial, submitLabel, pending = false, error, onSub
           </Field>
         </div>
 
-        <Field label="Tags">
-          <div className="flex flex-wrap gap-1.5">
-            {draft.tags.map((tag) => (
-              <Chip key={tag} className="pr-1">
-                {tag}
-                <button
-                  type="button"
-                  aria-label={`Remove tag ${tag}`}
-                  className="grid size-4 place-items-center rounded-full hover:bg-border"
-                  onClick={() => patch({ tags: draft.tags.filter((name) => name !== tag) })}
-                >
-                  <X className="size-3" />
-                </button>
-              </Chip>
+        <Field label="Category">
+          <Input
+            list="kl-category-suggestions"
+            value={draft.category}
+            placeholder="One category, e.g. chicken"
+            onChange={(event) => patch({ category: event.target.value })}
+          />
+          <datalist id="kl-category-suggestions">
+            {suggestions.map((name) => (
+              <option key={name} value={name} />
             ))}
-          </div>
-          <div className="mt-2 flex gap-2">
-            <Input
-              list="kl-tag-suggestions"
-              value={tagInput}
-              placeholder="Add a tag and press Enter"
-              onChange={(event) => setTagInput(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ',') {
-                  event.preventDefault();
-                  addTag(tagInput);
-                }
-              }}
-            />
-            <datalist id="kl-tag-suggestions">
-              {suggestions.map((name) => (
-                <option key={name} value={name} />
-              ))}
-            </datalist>
-            <Button type="button" variant="outline" onClick={() => addTag(tagInput)} disabled={!tagInput.trim()}>
-              Add
-            </Button>
-          </div>
+          </datalist>
         </Field>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -897,7 +861,11 @@ export function RecipeForm({ initial, submitLabel, pending = false, error, onSub
             <Input
               type="url"
               value={draft.sourceUrl}
-              onChange={(event) => patch({ sourceUrl: event.target.value })}
+              onChange={(event) => {
+                const url = event.target.value;
+                const autoType = isYouTubeUrl(url) && draft.sourceType === '' ? { sourceType: 'VIDEO' as SourceType } : {};
+                patch({ sourceUrl: url, ...autoType });
+              }}
               placeholder="https://…"
             />
           </Field>

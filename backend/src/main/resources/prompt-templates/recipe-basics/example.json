@@ -5,5 +5,5 @@
   "servings": { "amount": 2, "unit": "servings" },
   "times": { "prepMinutes": 15, "cookMinutes": 10 },
   "difficulty": "EASY",
-  "tags": ["fried", "fish"]
+  "category": "fried"
 }

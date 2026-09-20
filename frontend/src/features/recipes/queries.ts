@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import type { ImportPreview, Page, RecipeDetail, RecipeSummary, RecipeUpsert, Tag } from '@/lib/types';
+import type { ImportPreview, Page, RecipeDetail, RecipeSummary, RecipeUpsert, Category } from '@/lib/types';
 
 export interface RecipeFilters {
   q?: string;
-  tag?: string;
+  category?: string;
   favorite?: boolean;
   difficulty?: string;
   maxMinutes?: number;
@@ -22,8 +22,8 @@ function toQueryString(filters: RecipeFilters): string {
   return query ? `?${query}` : '';
 }
 
-export function useTags() {
-  return useQuery({ queryKey: ['tags'], queryFn: () => api.get<Tag[]>('/api/tags') });
+export function useCategories() {
+  return useQuery({ queryKey: ['categories'], queryFn: () => api.get<Category[]>('/api/categories') });
 }
 
 export function useRecipes(filters: RecipeFilters) {
@@ -77,7 +77,7 @@ export function useCreateRecipe() {
     onSuccess: (recipe) => {
       client.setQueryData(['recipe', recipe.id], recipe);
       void client.invalidateQueries({ queryKey: ['recipes'] });
-      void client.invalidateQueries({ queryKey: ['tags'] });
+      void client.invalidateQueries({ queryKey: ['categories'] });
     },
   });
 }
@@ -90,7 +90,7 @@ export function useUpdateRecipe() {
     onSuccess: (recipe) => {
       client.setQueryData(['recipe', recipe.id], recipe);
       void client.invalidateQueries({ queryKey: ['recipes'] });
-      void client.invalidateQueries({ queryKey: ['tags'] });
+      void client.invalidateQueries({ queryKey: ['categories'] });
     },
   });
 }
@@ -118,11 +118,33 @@ export function useRemoveRecipeImage() {
   });
 }
 
-export function useUploadTagCover() {
+export function useRecipeImageFromSource() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, file }: { id: number; file: File }) => api.upload<Tag>(`/api/tags/${id}/cover`, file),
-    onSuccess: () => void client.invalidateQueries({ queryKey: ['tags'] }),
+    mutationFn: (id: number) => api.post<RecipeDetail>(`/api/recipes/${id}/image/from-source`),
+    onSuccess: (recipe) => {
+      client.setQueryData(['recipe', recipe.id], recipe);
+      void client.invalidateQueries({ queryKey: ['recipes'] });
+    },
+  });
+}
+
+export function useUploadCategoryCover() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, file }: { id: number; file: File }) => api.upload<Category>(`/api/categories/${id}/cover`, file),
+    onSuccess: () => void client.invalidateQueries({ queryKey: ['categories'] }),
+  });
+}
+
+export function useDeleteCategory() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => api.delete<void>(`/api/categories/${id}`),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: ['categories'] });
+      void client.invalidateQueries({ queryKey: ['recipes'] });
+    },
   });
 }
 
@@ -132,7 +154,7 @@ export function useDeleteRecipe() {
     mutationFn: (id: number) => api.delete<void>(`/api/recipes/${id}`),
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: ['recipes'] });
-      void client.invalidateQueries({ queryKey: ['tags'] });
+      void client.invalidateQueries({ queryKey: ['categories'] });
     },
   });
 }

@@ -1,9 +1,9 @@
 package com.kitchenledger.web;
 
 import com.kitchenledger.security.CurrentUser;
+import com.kitchenledger.service.CategoryService;
 import com.kitchenledger.service.ImageStorageService;
-import com.kitchenledger.service.TagService;
-import com.kitchenledger.web.dto.TagResponse;
+import com.kitchenledger.web.dto.CategoryResponse;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,39 +21,39 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tags")
-public class TagController {
+@RequestMapping("/api/categories")
+public class CategoryController {
 
-    private final TagService tagService;
+    private final CategoryService categoryService;
     private final ImageStorageService imageStorage;
 
-    public TagController(TagService tagService, ImageStorageService imageStorage) {
-        this.tagService = tagService;
+    public CategoryController(CategoryService categoryService, ImageStorageService imageStorage) {
+        this.categoryService = categoryService;
         this.imageStorage = imageStorage;
     }
 
     @GetMapping
-    public List<TagResponse> list() {
-        return tagService.list(CurrentUser.requireId());
+    public List<CategoryResponse> list() {
+        return categoryService.list(CurrentUser.requireId());
     }
 
     @PatchMapping("/{id}")
-    public TagResponse update(@PathVariable Long id, @RequestBody UpdateTagRequest request) {
-        return tagService.update(CurrentUser.requireId(), id, request.name(), request.colorToken(), null);
+    public CategoryResponse update(@PathVariable Long id, @RequestBody UpdateCategoryRequest request) {
+        return categoryService.update(CurrentUser.requireId(), id, request.name(), request.colorToken(), null);
     }
 
     @PostMapping("/{id}/cover")
-    public TagResponse uploadCover(@PathVariable Long id, @RequestPart("file") MultipartFile file) {
+    public CategoryResponse uploadCover(@PathVariable Long id, @RequestPart("file") MultipartFile file) {
         Long ownerId = CurrentUser.requireId();
-        return tagService.update(ownerId, id, null, null, imageStorage.store(file));
+        return categoryService.update(ownerId, id, null, null, imageStorage.store(file));
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        tagService.delete(CurrentUser.requireId(), id);
+        categoryService.delete(CurrentUser.requireId(), id);
     }
 
-    public record UpdateTagRequest(@Size(max = 80) String name, @Size(max = 32) String colorToken) {
+    public record UpdateCategoryRequest(@Size(max = 80) String name, @Size(max = 32) String colorToken) {
     }
 }

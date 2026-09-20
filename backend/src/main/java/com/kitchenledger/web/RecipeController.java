@@ -42,7 +42,7 @@ public class RecipeController {
     @GetMapping
     public Page<RecipeSummaryResponse> search(
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) String tag,
+            @RequestParam(required = false) String category,
             @RequestParam(required = false) Boolean favorite,
             @RequestParam(required = false) Difficulty difficulty,
             @RequestParam(required = false) Integer maxMinutes,
@@ -51,7 +51,7 @@ public class RecipeController {
             @RequestParam(defaultValue = "updatedAt,desc") String sort) {
 
         return recipeService.search(
-                CurrentUser.requireId(), q, tag, favorite, difficulty, maxMinutes,
+                CurrentUser.requireId(), q, category, favorite, difficulty, maxMinutes,
                 PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), MAX_PAGE_SIZE), parseSort(sort)));
     }
 
@@ -93,6 +93,11 @@ public class RecipeController {
         // Confirm ownership before writing anything to disk.
         recipeService.get(ownerId, id);
         return recipeService.setImageKey(ownerId, id, imageStorage.store(file));
+    }
+
+    @PostMapping("/{id}/image/from-source")
+    public RecipeDetailResponse imageFromSource(@PathVariable Long id) {
+        return recipeService.setImageFromSource(CurrentUser.requireId(), id);
     }
 
     @DeleteMapping("/{id}/image")

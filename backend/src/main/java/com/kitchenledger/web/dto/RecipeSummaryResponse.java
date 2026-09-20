@@ -1,13 +1,11 @@
 package com.kitchenledger.web.dto;
 
+import com.kitchenledger.domain.Category;
 import com.kitchenledger.domain.Difficulty;
 import com.kitchenledger.domain.Recipe;
 import com.kitchenledger.domain.SourceType;
-import com.kitchenledger.domain.Tag;
 
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.List;
 
 /** Shape used by the middle list column: cheap enough to render hundreds of rows. */
 public record RecipeSummaryResponse(
@@ -21,10 +19,13 @@ public record RecipeSummaryResponse(
         Difficulty difficulty,
         boolean favorite,
         int ingredientCount,
-        List<TagRef> tags,
+        CategoryRef category,
         Instant updatedAt) {
 
-    public record TagRef(Long id, String name, String slug) {
+    public record CategoryRef(Long id, String name, String slug) {
+        public static CategoryRef from(Category category) {
+            return category == null ? null : new CategoryRef(category.getId(), category.getName(), category.getSlug());
+        }
     }
 
     public static RecipeSummaryResponse from(Recipe recipe) {
@@ -39,10 +40,7 @@ public record RecipeSummaryResponse(
                 recipe.getDifficulty(),
                 recipe.isFavorite(),
                 recipe.getIngredients().size(),
-                recipe.getTags().stream()
-                        .sorted(Comparator.comparing(Tag::getName))
-                        .map(tag -> new TagRef(tag.getId(), tag.getName(), tag.getSlug()))
-                        .toList(),
+                CategoryRef.from(recipe.getCategory()),
                 recipe.getUpdatedAt());
     }
 }

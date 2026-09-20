@@ -41,3 +41,35 @@ export function useResetUserPassword() {
       api.post<void>(`/api/admin/users/${id}/password`, { newPassword }),
   });
 }
+
+export interface ProxySetting {
+  host: string | null;
+  port: number | null;
+}
+
+export interface ProxyTestResult {
+  ok: boolean;
+  message: string;
+}
+
+export function useProxySetting(enabled: boolean) {
+  return useQuery({
+    queryKey: ['admin', 'proxy'],
+    queryFn: () => api.get<ProxySetting>('/api/admin/settings/proxy'),
+    enabled,
+  });
+}
+
+export function useUpdateProxySetting() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (input: ProxySetting) => api.put<ProxySetting>('/api/admin/settings/proxy', input),
+    onSuccess: (data) => client.setQueryData(['admin', 'proxy'], data),
+  });
+}
+
+export function useTestProxy() {
+  return useMutation({
+    mutationFn: (input: ProxySetting) => api.post<ProxyTestResult>('/api/admin/settings/proxy/test', input),
+  });
+}

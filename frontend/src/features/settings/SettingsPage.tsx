@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/primitives';
 import { UsersSection } from '@/features/admin/UsersSection';
+import { ServerProxySection } from '@/features/admin/ServerProxySection';
 import { ApiError, api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth';
@@ -110,7 +111,12 @@ export function SettingsPage() {
           </form>
         </Card>
 
-        {user?.role === 'ADMIN' && <UsersSection currentUserId={user.id} />}
+        {user?.role === 'ADMIN' && (
+          <>
+            <ServerProxySection />
+            <UsersSection currentUserId={user.id} />
+          </>
+        )}
 
         <Button variant="outline" onClick={() => void logout()}>
           <LogOut />

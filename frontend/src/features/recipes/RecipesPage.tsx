@@ -9,10 +9,10 @@ import type { ImportPreview } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ImportConfirmDialog } from './ImportConfirmDialog';
 import { RecipeDetail } from './RecipeDetail';
-import { RecipeList, TagFilterRow } from './RecipeList';
+import { RecipeList, CategoryFilterRow } from './RecipeList';
 import { exportRecipes } from './recipeExport';
-import { TagWall } from './TagWall';
-import { fetchAllRecipeSummaries, useImportCommit, useImportPreviewFile, useRecipes, useTags } from './queries';
+import { CategoryWall } from './CategoryWall';
+import { fetchAllRecipeSummaries, useImportCommit, useImportPreviewFile, useRecipes, useCategories } from './queries';
 
 const DURATION_FILTERS = [
   { label: '≤ 15 min', value: 15 },
@@ -34,13 +34,13 @@ export function RecipesPage() {
   const [actionError, setActionError] = useState<string | null>(null);
 
   const selectedId = id ? Number(id) : undefined;
-  const tagSlug = searchParams.get('tag') ?? undefined;
+  const categorySlug = searchParams.get('category') ?? undefined;
   const query = searchParams.get('q') ?? '';
   const favorite = searchParams.get('favorite') === 'true';
   const maxMinutes = searchParams.get('maxMinutes') ? Number(searchParams.get('maxMinutes')) : undefined;
 
-  const filters = { q: query, tag: tagSlug, favorite, maxMinutes };
-  const tags = useTags();
+  const filters = { q: query, category: categorySlug, favorite, maxMinutes };
+  const categories = useCategories();
   const recipes = useRecipes(filters);
   const previewFile = useImportPreviewFile();
   const commit = useImportCommit();
@@ -52,9 +52,9 @@ export function RecipesPage() {
     setSearchParams(next, { replace: true });
   }
 
-  function selectTag(slug?: string) {
-    setParam('tag', slug);
-    if (selectedId) navigate(`/recipes?${new URLSearchParams(slug ? { tag: slug } : {}).toString()}`);
+  function selectCategory(slug?: string) {
+    setParam('category', slug);
+    if (selectedId) navigate(`/recipes?${new URLSearchParams(slug ? { category: slug } : {}).toString()}`);
   }
 
   function toggleSelect(recipeId: number) {
@@ -121,18 +121,18 @@ export function RecipesPage() {
   return (
     <div className="grid h-full min-h-0 grid-cols-1 md:grid-cols-[clamp(300px,32vw,340px)_minmax(0,1fr)] lg:grid-cols-[clamp(210px,17vw,264px)_clamp(300px,24vw,360px)_minmax(0,1fr)]">
       <aside className="hidden min-h-0 overflow-y-auto scrollbar-thin border-r border-border lg:block">
-        <TagWall
-          tags={tags.data ?? []}
-          isLoading={tags.isLoading}
-          activeSlug={tagSlug}
+        <CategoryWall
+          categories={categories.data ?? []}
+          isLoading={categories.isLoading}
+          activeSlug={categorySlug}
           totalCount={totalCount}
-          onSelect={selectTag}
+          onSelect={selectCategory}
         />
       </aside>
 
       <section
         className={cn(
-          'relative flex min-h-0 min-w-0 flex-col border-r border-border',
+          '@container relative flex min-h-0 min-w-0 flex-col border-r border-border',
           selectedId ? 'hidden md:flex' : 'flex',
         )}
         onDragOver={(event) => {
@@ -209,23 +209,25 @@ export function RecipesPage() {
           )}
 
           {selectMode ? (
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span className="text-xs text-muted-foreground">{selectedIds.size} selected</span>
-              <Button variant="ghost" size="sm" onClick={() => void selectAll()}>
-                Select all
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedIds(new Set())}
-                disabled={selectedIds.size === 0}
-              >
-                Clear
-              </Button>
+            <div className="mt-2 flex flex-col gap-2 @sm:flex-row @sm:items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">{selectedIds.size} selected</span>
+                <Button variant="ghost" size="sm" onClick={() => void selectAll()}>
+                  Select all
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedIds(new Set())}
+                  disabled={selectedIds.size === 0}
+                >
+                  Clear
+                </Button>
+              </div>
               <Button
                 variant="primary"
                 size="sm"
-                className="ml-auto"
+                className="w-full @sm:ml-auto @sm:w-auto"
                 onClick={() => void runExport()}
                 disabled={selectedIds.size === 0 || exporting}
               >
@@ -236,14 +238,14 @@ export function RecipesPage() {
           ) : (
             <p className="mt-2 text-xs text-muted-foreground">
               {totalCount} {totalCount === 1 ? 'recipe' : 'recipes'}
-              {tagSlug ? ` in ${tags.data?.find((tag) => tag.slug === tagSlug)?.name ?? tagSlug}` : ''}
+              {categorySlug ? ` in ${categories.data?.find((category) => category.slug === categorySlug)?.name ?? categorySlug}` : ''}
             </p>
           )}
 
           {actionError && !importPreview && <p className="mt-2 text-xs text-destructive">{actionError}</p>}
         </header>
 
-        <TagFilterRow tags={tags.data ?? []} activeSlug={tagSlug} onSelect={selectTag} />
+        <CategoryFilterRow categories={categories.data ?? []} activeSlug={categorySlug} onSelect={selectCategory} />
 
         <div className="min-h-0 flex-1 overflow-y-auto scrollbar-thin">
           <RecipeList

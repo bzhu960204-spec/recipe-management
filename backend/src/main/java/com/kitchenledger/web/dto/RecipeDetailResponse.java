@@ -3,11 +3,9 @@ package com.kitchenledger.web.dto;
 import com.kitchenledger.domain.Difficulty;
 import com.kitchenledger.domain.Recipe;
 import com.kitchenledger.domain.SourceType;
-import com.kitchenledger.domain.Tag;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 
 public record RecipeDetailResponse(
@@ -27,7 +25,7 @@ public record RecipeDetailResponse(
         Difficulty difficulty,
         boolean favorite,
         String personalNotes,
-        List<RecipeSummaryResponse.TagRef> tags,
+        RecipeSummaryResponse.CategoryRef category,
         List<IngredientResponse> ingredients,
         List<StepResponse> steps,
         Instant createdAt,
@@ -51,10 +49,7 @@ public record RecipeDetailResponse(
                 recipe.getDifficulty(),
                 recipe.isFavorite(),
                 recipe.getPersonalNotes(),
-                recipe.getTags().stream()
-                        .sorted(Comparator.comparing(Tag::getName))
-                        .map(tag -> new RecipeSummaryResponse.TagRef(tag.getId(), tag.getName(), tag.getSlug()))
-                        .toList(),
+                RecipeSummaryResponse.CategoryRef.from(recipe.getCategory()),
                 recipe.getIngredients().stream().map(IngredientResponse::from).toList(),
                 recipe.getSteps().stream().map(StepResponse::from).toList(),
                 recipe.getCreatedAt(),

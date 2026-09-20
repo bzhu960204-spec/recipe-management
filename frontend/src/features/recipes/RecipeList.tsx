@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { Check, ChefHat, Clock, Star } from 'lucide-react';
 import { Chip, Skeleton } from '@/components/ui/primitives';
 import { imageSrc } from '@/lib/api';
@@ -17,6 +17,8 @@ interface Props {
 }
 
 export function RecipeList({ recipes, isLoading, selectedId, selectable, checkedIds, onToggle }: Props) {
+  const { search } = useLocation();
+
   if (isLoading) {
     return (
       <ul className="space-y-1 p-2">
@@ -110,7 +112,7 @@ export function RecipeList({ recipes, isLoading, selectedId, selectable, checked
               </button>
             ) : (
               <NavLink
-                to={`/recipes/${recipe.id}`}
+                to={{ pathname: `/recipes/${recipe.id}`, search }}
                 className={cn(
                   'flex gap-3 rounded-[var(--radius-card)] p-2 transition-colors',
                   recipe.id === selectedId ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
@@ -126,12 +128,12 @@ export function RecipeList({ recipes, isLoading, selectedId, selectable, checked
   );
 }
 
-export function TagFilterRow({
-  tags,
+export function CategoryFilterRow({
+  categories,
   activeSlug,
   onSelect,
 }: {
-  tags: Array<{ id: number; name: string; slug: string; recipeCount: number }>;
+  categories: Array<{ id: number; name: string; slug: string; recipeCount: number }>;
   activeSlug?: string;
   onSelect: (slug?: string) => void;
 }) {
@@ -140,11 +142,11 @@ export function TagFilterRow({
       <button type="button" onClick={() => onSelect(undefined)}>
         <Chip active={!activeSlug}>All</Chip>
       </button>
-      {tags.map((tag) => (
-        <button key={tag.id} type="button" onClick={() => onSelect(tag.slug)} className="shrink-0">
-          <Chip active={activeSlug === tag.slug}>
-            {tag.name}
-            <span className="opacity-60">{tag.recipeCount}</span>
+      {categories.map((category) => (
+        <button key={category.id} type="button" onClick={() => onSelect(category.slug)} className="shrink-0">
+          <Chip active={activeSlug === category.slug}>
+            {category.name}
+            <span className="opacity-60">{category.recipeCount}</span>
           </Chip>
         </button>
       ))}

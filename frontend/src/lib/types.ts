@@ -22,13 +22,13 @@ export interface LoginResponse {
   user: User;
 }
 
-export interface TagRef {
+export interface CategoryRef {
   id: number;
   name: string;
   slug: string;
 }
 
-export interface Tag extends TagRef {
+export interface Category extends CategoryRef {
   colorToken?: string | null;
   coverImageKey?: string | null;
   recipeCount: number;
@@ -74,7 +74,7 @@ export interface RecipeSummary {
   difficulty: Difficulty | null;
   favorite: boolean;
   ingredientCount: number;
-  tags: TagRef[];
+  category?: CategoryRef | null;
   updatedAt: string;
 }
 
@@ -121,7 +121,7 @@ export interface RecipeUpsert {
   difficulty?: Difficulty | null;
   favorite?: boolean | null;
   notes?: string | null;
-  tags?: string[];
+  category?: string | null;
   ingredients?: Array<{
     ref?: string | null;
     section?: string | null;

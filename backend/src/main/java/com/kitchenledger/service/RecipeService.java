@@ -31,25 +31,28 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
-    private final TagService tagService;
+    private final CategoryService categoryService;
     private final ImageStorageService imageStorage;
+    private final SourceThumbnailService sourceThumbnails;
 
     public RecipeService(
             RecipeRepository recipeRepository,
             UserRepository userRepository,
-            TagService tagService,
-            ImageStorageService imageStorage) {
+            CategoryService categoryService,
+            ImageStorageService imageStorage,
+            SourceThumbnailService sourceThumbnails) {
         this.recipeRepository = recipeRepository;
         this.userRepository = userRepository;
-        this.tagService = tagService;
+        this.categoryService = categoryService;
         this.imageStorage = imageStorage;
+        this.sourceThumbnails = sourceThumbnails;
     }
 
     @Transactional(readOnly = true)
     public Page<RecipeSummaryResponse> search(
             Long ownerId,
             String query,
-            String tagSlug,
+            String categorySlug,
             Boolean favorite,
             Difficulty difficulty,
             Integer maxMinutes,
@@ -57,7 +60,7 @@ public class RecipeService {
 
         Specification<Recipe> spec = Specification.where(RecipeSpecifications.ownedBy(ownerId))
                 .and(RecipeSpecifications.matchesText(query))
-                .and(RecipeSpecifications.hasTagSlug(tagSlug))
+                .and(RecipeSpecifications.hasCategorySlug(categorySlug))
                 .and(RecipeSpecifications.favoriteOnly(favorite))
                 .and(RecipeSpecifications.hasDifficulty(difficulty))
                 .and(RecipeSpecifications.maxTotalMinutes(maxMinutes));
@@ -127,6 +130,20 @@ public class RecipeService {
         return RecipeDetailResponse.from(recipe);
     }
 
+    /** Downloads the recipe's source-link thumbnail (YouTube) and stores it as the uploaded cover. */
+    @Transactional
+    public RecipeDetailResponse setImageFromSource(Long ownerId, Long recipeId) {
+        Recipe recipe = require(ownerId, recipeId);
+        byte[] thumbnail = sourceThumbnails.fetchYouTubeThumbnail(recipe.getSourceUrl());
+        String key = imageStorage.store(thumbnail);
+        String previous = recipe.getImageKey();
+        recipe.setImageKey(key);
+        if (previous != null && !previous.equals(key)) {
+            imageStorage.deleteQuietly(previous);
+        }
+        return RecipeDetailResponse.from(recipe);
+    }
+
     private Recipe require(Long ownerId, Long recipeId) {
         // Scoping by owner here (not in the controller) is what makes cross-account access impossible.
         return recipeRepository.findByIdAndOwnerId(recipeId, ownerId)
@@ -167,8 +184,7 @@ public class RecipeService {
 
         applyTimes(recipe, request.times());
 
-        recipe.getTags().clear();
-        recipe.getTags().addAll(tagService.resolveOrCreate(ownerId, request.tags()));
+        recipe.setCategory(categoryService.resolveOrCreate(ownerId, request.category()));
 
         applyIngredientsAndSteps(recipe, request);
     }

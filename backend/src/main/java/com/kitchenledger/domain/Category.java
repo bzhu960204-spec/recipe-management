@@ -17,11 +17,11 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Entity
-@Table(name = "tags", uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "slug"}))
+@Table(name = "categories", uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "slug"}))
 @Getter
 @Setter
 @NoArgsConstructor
-public class Tag {
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

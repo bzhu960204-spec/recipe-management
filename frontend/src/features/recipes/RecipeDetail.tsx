@@ -12,12 +12,14 @@ import {
   Star,
   Trash2,
   Users,
+  Youtube,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/input';
 import { Chip, Skeleton } from '@/components/ui/primitives';
 import { ImageDropZone } from '@/components/ImageDropZone';
 import { imageSrc } from '@/lib/api';
+import { isYouTubeUrl } from '@/lib/youtube';
 import { formatMinutes, scaleFactor } from '@/lib/quantity';
 import { cn } from '@/lib/utils';
 import { CookMode } from './CookMode';
@@ -26,6 +28,7 @@ import { IngredientPanel } from './IngredientPanel';
 import {
   useDeleteRecipe,
   useRecipe,
+  useRecipeImageFromSource,
   useRemoveRecipeImage,
   useSaveNotes,
   useToggleFavorite,
@@ -40,6 +43,7 @@ export function RecipeDetail({ id }: { id: number }) {
   const deleteRecipe = useDeleteRecipe();
   const uploadImage = useUploadRecipeImage();
   const removeImage = useRemoveRecipeImage();
+  const imageFromSource = useRecipeImageFromSource();
 
   const [servings, setServings] = useState(1);
   const [checked, setChecked] = useState<Set<number>>(new Set());
@@ -146,6 +150,22 @@ export function RecipeDetail({ id }: { id: number }) {
                 <ImagePlus />
                 {uploadImage.isPending ? 'Uploading…' : recipe.imageKey ? 'Replace photo' : 'Add photo'}
               </Button>
+              {isYouTubeUrl(recipe.sourceUrl) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    imageFromSource.mutate(recipe.id, {
+                      onError: (error) =>
+                        window.alert(error instanceof Error ? error.message : 'Could not fetch the video cover.'),
+                    })
+                  }
+                  disabled={imageFromSource.isPending}
+                >
+                  <Youtube />
+                  {imageFromSource.isPending ? 'Fetching…' : 'Use video cover'}
+                </Button>
+              )}
               {recipe.imageKey && (
                 <Button
                   variant="outline"
@@ -162,13 +182,11 @@ export function RecipeDetail({ id }: { id: number }) {
       </ImageDropZone>
 
       <div className="mx-auto max-w-3xl px-5 py-6">
-        <div className="mb-2 flex flex-wrap gap-1.5">
-          {recipe.tags.map((tag) => (
-            <Chip key={tag.id} className="uppercase">
-              {tag.name}
-            </Chip>
-          ))}
-        </div>
+        {recipe.category && (
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            <Chip className="uppercase">{recipe.category.name}</Chip>
+          </div>
+        )}
 
         <h1 className="text-3xl font-bold leading-tight">{recipe.title}</h1>
         {recipe.description && <p className="mt-2 text-muted-foreground">{recipe.description}</p>}

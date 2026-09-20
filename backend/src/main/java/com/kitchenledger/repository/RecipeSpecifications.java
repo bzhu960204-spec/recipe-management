@@ -1,9 +1,9 @@
 package com.kitchenledger.repository;
 
+import com.kitchenledger.domain.Category;
 import com.kitchenledger.domain.Difficulty;
 import com.kitchenledger.domain.Recipe;
 import com.kitchenledger.domain.RecipeIngredient;
-import com.kitchenledger.domain.Tag;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
@@ -43,13 +43,13 @@ public final class RecipeSpecifications {
         };
     }
 
-    public static Specification<Recipe> hasTagSlug(String slug) {
+    public static Specification<Recipe> hasCategorySlug(String slug) {
         if (slug == null || slug.isBlank()) {
             return null;
         }
         return (root, query, cb) -> {
-            Join<Recipe, Tag> tags = root.join("tags");
-            return cb.equal(tags.get("slug"), slug);
+            Join<Recipe, Category> category = root.join("category");
+            return cb.equal(category.get("slug"), slug);
         };
     }
 

@@ -27,7 +27,7 @@ public record RecipeUpsertRequest(
         Difficulty difficulty,
         Boolean favorite,
         @JsonAlias("personalNotes") String notes,
-        List<@Size(max = 80) String> tags,
+        @Size(max = 80) String category,
         @Valid List<IngredientInput> ingredients,
         @Valid List<StepInput> steps,
         /** Set by the importer so the original document survives future schema changes. */
