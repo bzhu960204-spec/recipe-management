@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { ChefHat, Clock, Star } from 'lucide-react';
+import { Check, ChefHat, Clock, Star } from 'lucide-react';
 import { Chip, Skeleton } from '@/components/ui/primitives';
 import { imageSrc } from '@/lib/api';
 import { formatMinutes } from '@/lib/quantity';
@@ -10,9 +10,13 @@ interface Props {
   recipes: RecipeSummary[];
   isLoading: boolean;
   selectedId?: number;
+  /** When set, rows toggle a checkbox instead of navigating. */
+  selectable?: boolean;
+  checkedIds?: Set<number>;
+  onToggle?: (id: number) => void;
 }
 
-export function RecipeList({ recipes, isLoading, selectedId }: Props) {
+export function RecipeList({ recipes, isLoading, selectedId, selectable, checkedIds, onToggle }: Props) {
   if (isLoading) {
     return (
       <ul className="space-y-1 p-2">
@@ -45,45 +49,76 @@ export function RecipeList({ recipes, isLoading, selectedId }: Props) {
     <ul className="p-2">
       {recipes.map((recipe) => {
         const thumbnail = imageSrc(recipe.imageKey, recipe.imageUrl);
+        const checked = checkedIds?.has(recipe.id) ?? false;
+        const inner = (
+          <>
+            {selectable && (
+              <span
+                className={cn(
+                  'mt-4 grid size-5 shrink-0 place-items-center rounded-[6px] border transition-colors',
+                  checked ? 'border-primary bg-primary text-primary-foreground' : 'border-border',
+                )}
+              >
+                {checked && <Check className="size-3.5" />}
+              </span>
+            )}
+            {thumbnail ? (
+              <img
+                src={thumbnail}
+                alt=""
+                loading="lazy"
+                className="size-14 shrink-0 rounded-[calc(var(--radius-card)-4px)] object-cover"
+              />
+            ) : (
+              <span className="grid size-14 shrink-0 place-items-center rounded-[calc(var(--radius-card)-4px)] bg-muted text-muted-foreground">
+                <ChefHat className="size-5" />
+              </span>
+            )}
+
+            <span className="min-w-0 flex-1 py-0.5">
+              <span className="flex items-start gap-1">
+                <span className="line-clamp-2 flex-1 text-sm font-semibold leading-snug">{recipe.title}</span>
+                {recipe.favorite && <Star className="mt-0.5 size-3.5 shrink-0 fill-current text-primary" />}
+              </span>
+
+              <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                {recipe.sourceName && <span className="truncate">{recipe.sourceName}</span>}
+                {recipe.totalMinutes ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="size-3" />
+                    {formatMinutes(recipe.totalMinutes)}
+                  </span>
+                ) : null}
+              </span>
+            </span>
+          </>
+        );
+
         return (
           <li key={recipe.id}>
-            <NavLink
-              to={`/recipes/${recipe.id}`}
-              className={cn(
-                'flex gap-3 rounded-[var(--radius-card)] p-2 transition-colors',
-                recipe.id === selectedId ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
-              )}
-            >
-              {thumbnail ? (
-                <img
-                  src={thumbnail}
-                  alt=""
-                  loading="lazy"
-                  className="size-14 shrink-0 rounded-[calc(var(--radius-card)-4px)] object-cover"
-                />
-              ) : (
-                <span className="grid size-14 shrink-0 place-items-center rounded-[calc(var(--radius-card)-4px)] bg-muted text-muted-foreground">
-                  <ChefHat className="size-5" />
-                </span>
-              )}
-
-              <span className="min-w-0 flex-1 py-0.5">
-                <span className="flex items-start gap-1">
-                  <span className="line-clamp-2 flex-1 text-sm font-semibold leading-snug">{recipe.title}</span>
-                  {recipe.favorite && <Star className="mt-0.5 size-3.5 shrink-0 fill-current text-primary" />}
-                </span>
-
-                <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                  {recipe.sourceName && <span className="truncate">{recipe.sourceName}</span>}
-                  {recipe.totalMinutes ? (
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="size-3" />
-                      {formatMinutes(recipe.totalMinutes)}
-                    </span>
-                  ) : null}
-                </span>
-              </span>
-            </NavLink>
+            {selectable ? (
+              <button
+                type="button"
+                onClick={() => onToggle?.(recipe.id)}
+                aria-pressed={checked}
+                className={cn(
+                  'flex w-full gap-3 rounded-[var(--radius-card)] p-2 text-left transition-colors',
+                  checked ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
+                )}
+              >
+                {inner}
+              </button>
+            ) : (
+              <NavLink
+                to={`/recipes/${recipe.id}`}
+                className={cn(
+                  'flex gap-3 rounded-[var(--radius-card)] p-2 transition-colors',
+                  recipe.id === selectedId ? 'bg-accent text-accent-foreground' : 'hover:bg-muted',
+                )}
+              >
+                {inner}
+              </NavLink>
+            )}
           </li>
         );
       })}

@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, Star, Plus } from 'lucide-react';
+import { CheckSquare, Download, Search, SlidersHorizontal, Star, Plus, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Chip } from '@/components/ui/primitives';
+import { ApiError } from '@/lib/api';
+import type { ImportPreview } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { ImportConfirmDialog } from './ImportConfirmDialog';
 import { RecipeDetail } from './RecipeDetail';
 import { RecipeList, TagFilterRow } from './RecipeList';
+import { exportRecipes } from './recipeExport';
 import { TagWall } from './TagWall';
-import { useRecipes, useTags } from './queries';
+import { fetchAllRecipeSummaries, useImportCommit, useImportPreviewFile, useRecipes, useTags } from './queries';
 
 const DURATION_FILTERS = [
   { label: '≤ 15 min', value: 15 },
@@ -22,14 +26,24 @@ export function RecipesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
 
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [exporting, setExporting] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [importPreview, setImportPreview] = useState<ImportPreview | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
   const selectedId = id ? Number(id) : undefined;
   const tagSlug = searchParams.get('tag') ?? undefined;
   const query = searchParams.get('q') ?? '';
   const favorite = searchParams.get('favorite') === 'true';
   const maxMinutes = searchParams.get('maxMinutes') ? Number(searchParams.get('maxMinutes')) : undefined;
 
+  const filters = { q: query, tag: tagSlug, favorite, maxMinutes };
   const tags = useTags();
-  const recipes = useRecipes({ q: query, tag: tagSlug, favorite, maxMinutes });
+  const recipes = useRecipes(filters);
+  const previewFile = useImportPreviewFile();
+  const commit = useImportCommit();
 
   function setParam(key: string, value?: string) {
     const next = new URLSearchParams(searchParams);
@@ -41,6 +55,65 @@ export function RecipesPage() {
   function selectTag(slug?: string) {
     setParam('tag', slug);
     if (selectedId) navigate(`/recipes?${new URLSearchParams(slug ? { tag: slug } : {}).toString()}`);
+  }
+
+  function toggleSelect(recipeId: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(recipeId)) next.delete(recipeId);
+      else next.add(recipeId);
+      return next;
+    });
+  }
+
+  function exitSelectMode() {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+    setActionError(null);
+  }
+
+  async function selectAll() {
+    setActionError(null);
+    try {
+      const all = await fetchAllRecipeSummaries(filters);
+      setSelectedIds(new Set(all.map((recipe) => recipe.id)));
+    } catch {
+      setActionError('Could not load the full list to select.');
+    }
+  }
+
+  async function runExport() {
+    if (selectedIds.size === 0) return;
+    setActionError(null);
+    setExporting(true);
+    try {
+      await exportRecipes([...selectedIds]);
+      exitSelectMode();
+    } catch (cause) {
+      setActionError(cause instanceof ApiError ? cause.message : 'Export failed. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  function handleDrop(file: File) {
+    setActionError(null);
+    previewFile.mutate(file, {
+      onSuccess: setImportPreview,
+      onError: (cause) => setActionError(cause instanceof ApiError ? cause.message : 'Could not read that file.'),
+    });
+  }
+
+  function confirmImport() {
+    if (!importPreview) return;
+    setActionError(null);
+    commit.mutate(
+      importPreview.items.map((item) => item.recipe),
+      {
+        onSuccess: () => setImportPreview(null),
+        onError: (cause) => setActionError(cause instanceof ApiError ? cause.message : 'Import failed.'),
+      },
+    );
   }
 
   const totalCount = recipes.data?.totalElements ?? 0;
@@ -59,9 +132,27 @@ export function RecipesPage() {
 
       <section
         className={cn(
-          'flex min-h-0 min-w-0 flex-col border-r border-border',
+          'relative flex min-h-0 min-w-0 flex-col border-r border-border',
           selectedId ? 'hidden md:flex' : 'flex',
         )}
+        onDragOver={(event) => {
+          if (Array.from(event.dataTransfer.types).includes('Files')) {
+            event.preventDefault();
+            setDragging(true);
+          }
+        }}
+        onDragLeave={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false);
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          setDragging(false);
+          const file = Array.from(event.dataTransfer.files).find(
+            (candidate) => candidate.type === 'application/json' || candidate.name.toLowerCase().endsWith('.json'),
+          );
+          if (file) handleDrop(file);
+          else setActionError('Drop a .json recipe file to import.');
+        }}
       >
         <header className="border-b border-border p-3">
           <div className="flex items-center gap-2">
@@ -81,6 +172,14 @@ export function RecipesPage() {
               onClick={() => setShowFilters((open) => !open)}
             >
               <SlidersHorizontal />
+            </Button>
+            <Button
+              variant={selectMode ? 'primary' : 'outline'}
+              size="icon"
+              aria-label={selectMode ? 'Cancel selection' : 'Select recipes to export'}
+              onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
+            >
+              <CheckSquare />
             </Button>
             <Button variant="outline" size="icon" aria-label="New recipe" onClick={() => navigate('/recipes/new')}>
               <Plus />
@@ -109,10 +208,39 @@ export function RecipesPage() {
             </div>
           )}
 
-          <p className="mt-2 text-xs text-muted-foreground">
-            {totalCount} {totalCount === 1 ? 'recipe' : 'recipes'}
-            {tagSlug ? ` in ${tags.data?.find((tag) => tag.slug === tagSlug)?.name ?? tagSlug}` : ''}
-          </p>
+          {selectMode ? (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">{selectedIds.size} selected</span>
+              <Button variant="ghost" size="sm" onClick={() => void selectAll()}>
+                Select all
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedIds(new Set())}
+                disabled={selectedIds.size === 0}
+              >
+                Clear
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                className="ml-auto"
+                onClick={() => void runExport()}
+                disabled={selectedIds.size === 0 || exporting}
+              >
+                <Download />
+                {exporting ? 'Exporting…' : `Export${selectedIds.size ? ` (${selectedIds.size})` : ''}`}
+              </Button>
+            </div>
+          ) : (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {totalCount} {totalCount === 1 ? 'recipe' : 'recipes'}
+              {tagSlug ? ` in ${tags.data?.find((tag) => tag.slug === tagSlug)?.name ?? tagSlug}` : ''}
+            </p>
+          )}
+
+          {actionError && !importPreview && <p className="mt-2 text-xs text-destructive">{actionError}</p>}
         </header>
 
         <TagFilterRow tags={tags.data ?? []} activeSlug={tagSlug} onSelect={selectTag} />
@@ -122,8 +250,20 @@ export function RecipesPage() {
             recipes={recipes.data?.content ?? []}
             isLoading={recipes.isLoading}
             selectedId={selectedId}
+            selectable={selectMode}
+            checkedIds={selectedIds}
+            onToggle={toggleSelect}
           />
         </div>
+
+        {dragging && (
+          <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-background/80 p-4">
+            <div className="flex flex-col items-center gap-2 rounded-[var(--radius-card)] border border-dashed border-ring px-6 py-8 text-sm font-medium">
+              <Upload className="size-6" />
+              Drop a recipe file to import
+            </div>
+          </div>
+        )}
       </section>
 
       <section className={cn('min-h-0', selectedId ? 'block' : 'hidden md:block')}>
@@ -137,6 +277,19 @@ export function RecipesPage() {
           </div>
         )}
       </section>
+
+      {importPreview && (
+        <ImportConfirmDialog
+          preview={importPreview}
+          pending={commit.isPending}
+          error={actionError}
+          onConfirm={confirmImport}
+          onClose={() => {
+            setImportPreview(null);
+            setActionError(null);
+          }}
+        />
+      )}
     </div>
   );
 }

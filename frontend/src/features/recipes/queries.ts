@@ -33,6 +33,14 @@ export function useRecipes(filters: RecipeFilters) {
   });
 }
 
+/** Pulls every summary matching a filter (up to the server's 200 page cap) for "select all" export. */
+export async function fetchAllRecipeSummaries(filters: RecipeFilters): Promise<RecipeSummary[]> {
+  const query = toQueryString(filters);
+  const separator = query ? '&' : '?';
+  const page = await api.get<Page<RecipeSummary>>(`/api/recipes${query}${separator}size=200`);
+  return page.content;
+}
+
 export function useRecipe(id: number | undefined) {
   return useQuery({
     queryKey: ['recipe', id],
