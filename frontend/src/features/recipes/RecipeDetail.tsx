@@ -5,6 +5,7 @@ import {
   ChefHat,
   Clock,
   ExternalLink,
+  FileDown,
   Gauge,
   ImagePlus,
   Pencil,
@@ -20,6 +21,7 @@ import { imageSrc } from '@/lib/api';
 import { formatMinutes, scaleFactor } from '@/lib/quantity';
 import { cn } from '@/lib/utils';
 import { CookMode } from './CookMode';
+import { openRecipeHtml } from './exportHtml';
 import { IngredientPanel } from './IngredientPanel';
 import {
   useDeleteRecipe,
@@ -120,6 +122,14 @@ export function RecipeDetail({ id }: { id: number }) {
                 onClick={() => toggleFavorite.mutate({ id: recipe.id, favorite: !recipe.favorite })}
               >
                 <Star className={cn(recipe.favorite && 'fill-current')} />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Export recipe"
+                onClick={() => void openRecipeHtml(recipe)}
+              >
+                <FileDown />
               </Button>
               <Button
                 variant="outline"
